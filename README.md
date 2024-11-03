@@ -8,7 +8,7 @@ Este proyecto es una guía completa de temas fundamentales de extracción de dat
 
 ## Contenido del Proyecto
 
-1. SQL y Manipulación de Bases de Datos  
+> SQL y Manipulación de Bases de Datos  
   
   
 - Consultas Básicas: Ejercicios prácticos de consultas fundamentales como SELECT, UPDATE, DELETE, e INSERT.
@@ -76,7 +76,7 @@ This project is a comprehensive guide covering fundamental topics in data extrac
 
 ## Project Content 
 
-1. SQL and Database Manipulation  
+> SQL and Database Manipulation  
   
 
 - Basic Queries: Practical exercises on fundamental queries such as SELECT, UPDATE, DELETE, and INSERT.
@@ -123,7 +123,7 @@ My name is Laura Gutiérrez Fariñas, a student at Adalab focused on development
 
 - Data Analysis and Visualization: Organizing and presenting data effectively.
 
-## Soft Skills:
+> Soft Skills:
 
 - Problem-Solving: Analytical approach to solving complex problems.
 
