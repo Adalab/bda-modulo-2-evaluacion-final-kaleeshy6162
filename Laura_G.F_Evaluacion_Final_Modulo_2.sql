@@ -88,12 +88,12 @@ SELECT `rating`, COUNT(*) AS `total_movies`
 /*10. Encuentra la cantidad total de películas alquiladas por cada cliente y muestra el ID del cliente, su nombre y apellido junto con la cantidad de películas alquiladas.
    10. Find the total number of movies rented by each customer and display the customer ID, their first and last name, along with the count of rented movies. */
 
-SELECT `c`.`customer_id`, `c`.`first_name`, `c`.`last_name`, COUNT(`r`.`rental_id`) AS `total_rentals`
+SELECT `c`.`customer_id`, `c`.`first_name`, `c`.`last_name`, COUNT(`r`.`rental_id`) AS `total_rentals`  
 	FROM `customer` AS  `c`
-		LEFT JOIN `rental` AS `r` 
-			ON `c`.`customer_id` = `r`.`customer_id`
-	GROUP BY `c`.`customer_id`, `c`.`first_name`, `c`.`last_name`
-	ORDER BY `total_rentals` DESC;
+		LEFT JOIN `rental` AS `r`                  -- Utilizo LEFT JOIN para combinar datos de dos tablas, seleccionando todos los registros de la tabla de la izquierda. / I use LEFT JOIN to combine data from two tables, selecting all records from the left table.
+			ON `c`.`customer_id` = `r`.`customer_id`       -- Establece la condición de unión en base al ID del cliente / Sets the join condition based on the customer ID.
+	GROUP BY `c`.`customer_id`, `c`.`first_name`, `c`.`last_name`    -- Agrupo los registros en una columna /  I group the records in a column.
+	ORDER BY `total_rentals` DESC;                 -- Lo ordeno de forma descendente /I sort it in descending order.
 
 
 /* 11. Encuentra la cantidad total de películas alquiladas por categoría y muestra el nombre de la categoría junto con el recuento de alquileres.
@@ -101,20 +101,20 @@ SELECT `c`.`customer_id`, `c`.`first_name`, `c`.`last_name`, COUNT(`r`.`rental_i
 
 SELECT `name` AS `category_name`, COUNT(`r`.`rental_id`) AS `total_rentals`
 	FROM `rental` AS `r`
-		JOIN `inventory` AS `i` 
+		JOIN `inventory` AS `i`                -- Utilizo JOIN para combinar datos de dos o mas tablas / I use JOIN to combine data from two or more tables.
 			ON r.`inventory_id` = `i`.`inventory_id`
 		JOIN `film_category` AS `fc` 
 			ON `i`.`film_id` = `fc`.`film_id`
 		JOIN `category` AS `cat` 
 			ON `fc`.`category_id` = `cat`.`category_id`
-	GROUP BY `name`
-	ORDER BY `total_rentals` DESC;
+	GROUP BY `name`                            -- Agrupo los registros en una columna / I group the records into a column.
+	ORDER BY `total_rentals` DESC;           -- Lo ordeno de forma descendente / I sort it in descending order.
 
 
 /* 12. Encuentra el promedio de duración de las películas para cada clasificación de la tabla film y muestra la clasificación junto con el promedio de duración.
    12. Find the average runtime of movies for each rating category in the film table and show the rating along with the average runtime. */
 
-SELECT `rating`, round(AVG(length), 0) AS `average_duration`
+SELECT `rating`, round(AVG(length), 0) AS `average_duration`   -- Calculo el promedio con el length y calculo el promedio con AVG / I calculate the average with length and compute the average using AVG.
 	FROM `film`
 	GROUP BY `rating`
 	ORDER BY `average_duration` DESC;
@@ -137,21 +137,23 @@ SELECT `a`.`first_name`, `a`.`last_name`
 
 SELECT `title`
 	FROM `film`
-	WHERE `description` LIKE '%dog%' OR `description` LIKE '%cat%';
-
+	WHERE `description` LIKE '%dog%' OR `description` LIKE '%cat%'; /* filtro registros en una consulta, de modo que solo se devuelvan aquellos que cumplen una condición específica
+																	   I filter records in a query so that only those that meet a specific condition are returned.*/
 
 /* 15. Hay algún actor o actriz que no apareca en ninguna película en la tabla film_actor.
    15. Is there any actor or actress not appearing in any movie in the film_actor table? */
 
+-- No se encuentra ningun registro. / No records found.
 SELECT `first_name`, `last_name`
 	FROM `actor`
-	WHERE `actor_id` NOT IN (SELECT `actor_id` FROM `film_actor`);
+	WHERE `actor_id` NOT IN (SELECT `actor_id` FROM `film_actor`);  -- Utilizo una NOT IN(subconsulta) para excluir los nombres que no aparezcan en ninguna pelicula / I use a NOT IN (subquery) to exclude names that do not appear in any movie.
 
+-- Sin subconsulta, con union de tablas / Without a subquery, with a union of tables.
 SELECT `a`.`first_name`, `a`.`last_name`
 	FROM `actor` AS `a`
-	LEFT JOIN `film_actor` AS `fa` 
+	LEFT JOIN `film_actor` AS `fa`           
 		ON `a`.`actor_id` = `fa`.`actor_id`
-	WHERE `fa`.`actor_id` IS NULL;
+	WHERE `fa`.`actor_id` IS NULL;    -- IS NULL Verifica si el valor de una columna es NULL, es decir esta vacio. / IS NULL checks if the value of a column is NULL, meaning it is empty.
 
 
 /* 16. Encuentra el título de todas las películas que fueron lanzadas entre el año 2005 y 2010.
@@ -159,7 +161,7 @@ SELECT `a`.`first_name`, `a`.`last_name`
 
 SELECT `title`
 	FROM `film`
-	WHERE `release_year` BETWEEN 2005 AND 2010;
+	WHERE `release_year` BETWEEN 2005 AND 2010;        
 
 
 /* 17. Encuentra el título de todas las películas que son de la misma categoría que "Family".
@@ -177,15 +179,15 @@ SELECT `f.title`
 /* 18. Muestra el nombre y apellido de los actores que aparecen en más de 10 películas.
    18. Display the first and last name of actors who appear in more than 10 movies. */
    
--- Con la columna movie_count
+-- Con la columna movie_count / With the column movie_count.
 SELECT `a`.`first_name`, `a`.`last_name`, COUNT(`fa`.`film_id`) AS `movie_count`
 	FROM `actor` AS `a`
 		JOIN `film_actor` AS `fa` 
 			ON `a`.`actor_id` = `fa`.`actor_id`
 	GROUP BY `a`.`actor_id`, `a`.`first_name`, `a`.`last_name`
-	HAVING `movie_count` > 10;
+	HAVING `movie_count` > 10;    -- Filtro los grupos de registro que se han creado con el GROUP BY / I filter the groups of records that have been created with GROUP BY.
 
--- Sin la columna movie_count
+-- Sin la columna movie_count / Without the movie_count column.
 SELECT `a`.`first_name`, `a`.`last_name`
 	FROM `actor` AS `a`
 		JOIN `film_actor` AS `fa` 
@@ -225,7 +227,7 @@ SELECT `a`.`first_name`, `a`.`last_name`, COUNT(`fa`.`film_id`) AS `movie_count`
 	GROUP BY `a`.`actor_id`, `a`.`first_name`, `a`.`last_name`
 	HAVING `movie_count` >= 5;
 
--- Con el nombre y el apellido en la misma columna
+-- Con el nombre y el apellido en la misma columna / With the first name and last name in the same column.
 SELECT CONCAT(`first_name`, ' ', `last_name`) AS `full_name`, COUNT(`fa`.`film_id`) AS `movie_count`
 	FROM `actor` AS `a`
 	JOIN `film_actor` AS `fa` 
@@ -239,11 +241,11 @@ SELECT CONCAT(`first_name`, ' ', `last_name`) AS `full_name`, COUNT(`fa`.`film_i
 
 SELECT `f`.`title`
 	FROM `film` AS `f`
-	WHERE `f`.`film_id` IN (SELECT `i`.`film_id`
+	WHERE `f`.`film_id` IN (SELECT `i`.`film_id`     -- Utilizo una subconsulta selecciono `film_id` de la tabla `inventory` / I use a subquery to select film_id from the inventory table.
 						FROM `inventory` AS `i`
-						WHERE `i`.`inventory_id` IN (SELECT `r`.`inventory_id`            
+						WHERE `i`.`inventory_id` IN (SELECT `r`.`inventory_id`    -- Utilizo una subconsulta interna para seleccionar todos los inventory_id de la tabla rental / I use an inner subquery to select all inventory_id from the rental table.        
 								FROM `rental` AS `r`
-								WHERE (`r`.`return_date` - `r`.`rental_date`) > 5));
+								WHERE (`r`.`return_date` - `r`.`rental_date`) > 5));  -- Condición: Filtro los registros donde la duración del alquiler fue superior a 5 días / Condition: I filter the records where the rental duration was greater than 5 days.
 
 
 
@@ -274,25 +276,25 @@ WHERE `a`.`actor_id` NOT IN (SELECT `fa`.`actor_id`
 
 SELECT `f`.`title`
 	FROM `film` AS `f`
-	JOIN `film_category` AS `fc` 
+	JOIN `film_category` AS `fc`  -- Hago un JOIN con la tabla `film_category` para acceder a las categorías de cada película / I perform a JOIN with the film_category table to access the categories of each movie.
 		ON `f`.`film_id` = `fc`.`film_id`
-	JOIN `category` AS `c` 
+	JOIN `category` AS `c`   -- Hago otro JOIN con la tabla `category` para obtener los nombres de las categorías / I perform another JOIN with the category table to obtain the names of the categories.
 		ON `fc`.`category_id` = `c`.`category_id`
-	WHERE `c`.`name` = 'Comedy' AND `f`.`length` > 180;
-
+	WHERE `c`.`name` = 'Comedy' AND `f`.`length` > 180;   /* Filtro para que solo se incluyan películas de la categoría "Comedy" y filtro para que solo se incluyan películas con duración mayor a 180 minutos
+															 I filter to include only movies from the "Comedy" category and filter to include only movies with a duration greater than 180 minutes.*/
 
 /* 25. Encuentra todos los actores que han actuado juntos en al menos una película. La consulta debe mostrar el nombre y apellido de los actores y el número de películas en las que han actuado juntos.
    25. Find all actors who have acted together in at least one movie. The query should display the first and last name of the actors and the number of movies they've acted in together. */
 
 SELECT `a1`.`first_name` AS `actor1_first_name`, `a1`.`last_name` AS `actor1_last_name`, `a2`.`first_name` AS `actor2_first_name`, `a2`.`last_name` AS `actor2_last_name`, COUNT(`fa1`.`film_id`) AS `co_stars_count`
-	FROM `film_actor` AS `fa1`
+	FROM `film_actor` AS `fa1`                 -- Selecciono el nombre y el apellido del primer, segundo actor y Utilizo COUNT para contar el número de películas en las que han actuado juntos / I select the first name and last name of the first and second actor, and I use COUNT to count the number of movies they have acted in together.
 		JOIN `film_actor` AS `fa2` 
-			ON `fa1`.`film_id` = `fa2`.`film_id` AND `fa1`.`actor_id` <> `fa2`.`actor_id`
+			ON `fa1`.`film_id` = `fa2`.`film_id` AND `fa1`.`actor_id` <> `fa2`.`actor_id` -- Aseguro que no se cuente al mismo actor / I ensure that the same actor is not counted.
 		JOIN `actor` AS `a1`
 			ON `fa1`.`actor_id` = `a1`.`actor_id`
 		JOIN `actor` AS `a2` 
 			ON `fa2`.`actor_id` = `a2`.`actor_id`
-	GROUP BY `a1`.`actor_id`, `a2`.`actor_id`
-	HAVING COUNT(`fa1`.`film_id`) >= 1
-	ORDER BY `actor1_first_name`, `actor1_last_name`, `actor2_first_name`, `actor2_last_name`;
-
+	GROUP BY `a1`.`actor_id`, `a2`.`actor_id`  -- Agrupo los resultados por los IDs de ambos actores para poder utilizar la funcion COUNT() / I group the results by the IDs of both actors in order to use the COUNT() function.
+	HAVING COUNT(`fa1`.`film_id`) >= 1  --  filtro los resultados para incluir solo aquellos pares de actores que han trabajado juntos en al menos una película. / I filter the results to include only those pairs of actors who have worked together in at least one movie.
+	ORDER BY `actor1_first_name`, `actor1_last_name`, `actor2_first_name`, `actor2_last_name`;  /* Ordeno alfabéticamente por el nombre y apellido del primer actor, y luego por el nombre y apellido del segundo actor.
+																								   I sort alphabetically by the first name and last name of the first actor, and then by the first name and last name of the second actor.*/
